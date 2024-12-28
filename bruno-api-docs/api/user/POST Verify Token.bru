@@ -1,0 +1,21 @@
+meta {
+  name: POST Verify Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{api_url}}/users/verify-token
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUzOTQyNDIsInVzZXJfaWQiOjF9.oX36J61AOYidFU_RjzNF-0u3TjCalcWlAizyEGTKaq8
+}
+
+body:json {
+  {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUzOTQyNDIsInVzZXJfaWQiOjF9.oX36J61AOYidFU_RjzNF-0u3TjCalcWlAizyEGTKaq8"
+  }
+}

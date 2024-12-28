@@ -1,0 +1,25 @@
+meta {
+  name: PATCH Chat
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{api_url}}/chats/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU0MDA2NTgsInVzZXJfaWQiOjF9.5SnKMrTv96RXFIU7y2ksru9vWJr0TVEAgxuoz5EjCoQ
+}
+
+body:json {
+  {
+    "name": "chat-1-updated"
+  }
+}

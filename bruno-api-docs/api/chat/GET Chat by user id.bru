@@ -1,0 +1,19 @@
+meta {
+  name: GET Chat by user id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{api_url}}/chats/user/:user_id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  user_id: 1
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU0MDA2NTgsInVzZXJfaWQiOjF9.5SnKMrTv96RXFIU7y2ksru9vWJr0TVEAgxuoz5EjCoQ
+}

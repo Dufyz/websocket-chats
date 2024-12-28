@@ -1,0 +1,24 @@
+meta {
+  name: POST Chat
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{api_url}}/chats
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU0MDA2NTgsInVzZXJfaWQiOjF9.5SnKMrTv96RXFIU7y2ksru9vWJr0TVEAgxuoz5EjCoQ
+}
+
+body:json {
+  {
+    "admin_user_id": 1,
+    "name": "chat-2",
+    "category": "chat",
+    "description": null
+  }
+}

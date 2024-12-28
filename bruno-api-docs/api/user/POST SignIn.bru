@@ -1,0 +1,18 @@
+meta {
+  name: POST SignIn
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{api_url}}/users/sign-in
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Buceta",
+    "password": "12345678"
+  }
+}

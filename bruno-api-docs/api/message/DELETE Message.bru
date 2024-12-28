@@ -1,0 +1,25 @@
+meta {
+  name: DELETE Message
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{api_url}}/messages/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU0MDI1NjYsInVzZXJfaWQiOjF9.7keNnQn3XrMbIErbZccUfDAtxuOX9Usemk-113JoLrs
+}
+
+body:json {
+  {
+    "message": "Test message updated"
+  }
+}

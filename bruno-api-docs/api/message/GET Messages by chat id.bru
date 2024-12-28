@@ -1,0 +1,15 @@
+meta {
+  name: GET Messages by chat id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{api_url}}/messages/chat/:chat_id
+  body: none
+  auth: none
+}
+
+params:path {
+  chat_id: 1
+}

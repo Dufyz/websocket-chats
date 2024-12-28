@@ -1,0 +1,19 @@
+meta {
+  name: DELETE Chat
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{api_url}}/chats/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 5
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU0MDA2NTgsInVzZXJfaWQiOjF9.5SnKMrTv96RXFIU7y2ksru9vWJr0TVEAgxuoz5EjCoQ
+}
