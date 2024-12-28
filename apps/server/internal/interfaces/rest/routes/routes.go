@@ -15,4 +15,5 @@ func UseRoutes(e *echo.Echo, db *sql.DB) {
 	WebsocketRoutes(api)
 	UserRoutes(api, authenticatedApi, db)
 	ChatRoutes(api, authenticatedApi, db)
+	MessageRoutes(api, authenticatedApi, db)
 }
