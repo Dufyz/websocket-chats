@@ -140,7 +140,7 @@ func (uc *userController) PatchUser(ctx echo.Context) error {
 	var body dto.PatchUser
 	validate := validator.New()
 
-	user_id, errorMessage := utils.GetIntParam(ctx, "id")
+	userId, errorMessage := utils.GetInt64Param(ctx, "id")
 	if errorMessage != "" {
 		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": errorMessage,
@@ -161,7 +161,7 @@ func (uc *userController) PatchUser(ctx echo.Context) error {
 	}
 
 	// TODO: Validar se o usuário que está tentando alterar é o mesmo que está logado
-	user, err := uc.userUsecase.PatchUser(int64(user_id), body)
+	user, err := uc.userUsecase.PatchUser(userId, body)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
@@ -183,7 +183,7 @@ func (uc *userController) PatchUserPassword(ctx echo.Context) error {
 	var body dto.PatchUserPassword
 	validate := validator.New()
 
-	user_id, errorMessage := utils.GetIntParam(ctx, "id")
+	userId, errorMessage := utils.GetInt64Param(ctx, "id")
 	if errorMessage != "" {
 		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": errorMessage,
@@ -204,7 +204,7 @@ func (uc *userController) PatchUserPassword(ctx echo.Context) error {
 	}
 
 	// TODO: Validar se o usuário que está tentando alterar é o mesmo que está logado
-	user, err := uc.userUsecase.PatchUserPassword(int64(user_id), body)
+	user, err := uc.userUsecase.PatchUserPassword(userId, body)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),

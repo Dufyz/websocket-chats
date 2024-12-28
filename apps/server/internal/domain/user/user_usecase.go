@@ -79,20 +79,20 @@ func (uc *UserUsecase) SignIn(body dto.PostUserSignIn) (*User, string, error) {
 	return user, token, err
 }
 
-func (uc *UserUsecase) GetUserById(user_id int64) (*User, error) {
-	return uc.repository.GetUserById(user_id)
+func (uc *UserUsecase) GetUserById(userId int64) (*User, error) {
+	return uc.repository.GetUserById(userId)
 }
 
 func (uc *UserUsecase) GetUserByName(name string) (*User, error) {
 	return uc.repository.GetUserByName(name)
 }
 
-func (uc *UserUsecase) PatchUser(user_id int64, body dto.PatchUser) (*User, error) {
-	return uc.repository.PatchUser(user_id, body)
+func (uc *UserUsecase) PatchUser(userId int64, body dto.PatchUser) (*User, error) {
+	return uc.repository.PatchUser(userId, body)
 }
 
-func (uc *UserUsecase) PatchUserPassword(user_id int64, body dto.PatchUserPassword) (*User, error) {
-	user, err := uc.repository.GetUserById(user_id)
+func (uc *UserUsecase) PatchUserPassword(userId int64, body dto.PatchUserPassword) (*User, error) {
+	user, err := uc.repository.GetUserById(userId)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (uc *UserUsecase) PatchUserPassword(user_id int64, body dto.PatchUserPasswo
 		return nil, err
 	}
 
-	err = uc.repository.PatchUserPassword(user_id, hashedPassword)
+	err = uc.repository.PatchUserPassword(userId, hashedPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -120,11 +120,11 @@ func (uc *UserUsecase) PatchUserPassword(user_id int64, body dto.PatchUserPasswo
 	return user, nil
 }
 
-func (uc *UserUsecase) GenerateToken(user_id int64) (string, error) {
+func (uc *UserUsecase) GenerateToken(userId int64) (string, error) {
 	var JWT_KEY = []byte(os.Getenv("JWT_KEY"))
 
 	claims := jwt.MapClaims{}
-	claims["user_id"] = user_id
+	claims["user_id"] = userId
 	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() // Token valid for 1 hour
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -148,8 +148,8 @@ func (uc *UserUsecase) VerifyToken(tokenString string) (*User, *string, error) {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := int64(claims["user_id"].(float64))
-		user, err := uc.repository.GetUserById(userID)
+		userId := int64(claims["user_id"].(float64))
+		user, err := uc.repository.GetUserById(userId)
 		if err != nil {
 			return nil, nil, err
 		}

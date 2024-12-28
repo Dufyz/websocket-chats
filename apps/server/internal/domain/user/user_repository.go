@@ -26,12 +26,12 @@ func (ur *UserRepository) SignUp(body dto.PostUserSignUp) error {
 		return err
 	}
 
-	var user_id int64
+	var userId int64
 	err = tx.QueryRow(`
 		INSERT INTO "users" (name, password)
 		VALUES ($1, $2)
 		RETURNING id
-	`, body.Name, body.Password).Scan(&user_id)
+	`, body.Name, body.Password).Scan(&userId)
 
 	if err != nil {
 		zap.L().Error("Error on INSERT INTO user User/Repository/SignUp", zap.Error(err))
@@ -47,7 +47,7 @@ func (ur *UserRepository) SignUp(body dto.PostUserSignUp) error {
 	return nil
 }
 
-func (ur *UserRepository) GetUserById(user_id int64) (*User, error) {
+func (ur *UserRepository) GetUserById(userId int64) (*User, error) {
 	var user User
 
 	query, err := ur.connection.Prepare(`
@@ -63,7 +63,7 @@ func (ur *UserRepository) GetUserById(user_id int64) (*User, error) {
 
 	defer query.Close()
 
-	err = query.QueryRow(user_id).Scan(
+	err = query.QueryRow(userId).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Password,
@@ -119,7 +119,7 @@ func (ur *UserRepository) GetUserByName(name string) (*User, error) {
 	return &user, nil
 }
 
-func (ur *UserRepository) PatchUser(user_id int64, body dto.PatchUser) (*User, error) {
+func (ur *UserRepository) PatchUser(userId int64, body dto.PatchUser) (*User, error) {
 	var updatedUser User
 
 	tx, err := ur.connection.Begin()
@@ -132,7 +132,7 @@ func (ur *UserRepository) PatchUser(user_id int64, body dto.PatchUser) (*User, e
 	err = tx.QueryRow(`
 		SELECT id, name, password, created_at, updated_at 
 		FROM "users" 
-		WHERE id = $1`, user_id).Scan(
+		WHERE id = $1`, userId).Scan(
 		&updatedUser.ID,
 		&updatedUser.Name,
 		&updatedUser.Password,
@@ -159,7 +159,7 @@ func (ur *UserRepository) PatchUser(user_id int64, body dto.PatchUser) (*User, e
 		WHERE id = $3`,
 		updatedUser.Name,
 		updatedUser.Password,
-		user_id,
+		userId,
 	)
 
 	if err != nil {
@@ -176,7 +176,7 @@ func (ur *UserRepository) PatchUser(user_id int64, body dto.PatchUser) (*User, e
 	return &updatedUser, nil
 }
 
-func (ur *UserRepository) PatchUserPassword(user_id int64, password string) error {
+func (ur *UserRepository) PatchUserPassword(userId int64, password string) error {
 	tx, err := ur.connection.Begin()
 	if err != nil {
 		zap.L().Error("Error starting transaction User/Repository/PatchUserPassword", zap.Error(err))
@@ -187,7 +187,7 @@ func (ur *UserRepository) PatchUserPassword(user_id int64, password string) erro
 		UPDATE "users"
 		SET password = $1, updated_at = now()
 		WHERE id = $2
-	`, password, user_id)
+	`, password, userId)
 
 	if err != nil {
 		zap.L().Error("Error updating user password User/Repository/PatchUserPassword", zap.Error(err))
