@@ -1,11 +1,20 @@
 import { Outlet } from "react-router-dom";
 
 import "@/styles/globals.css";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import ThemeProvider from "@/providers/theme.provider";
+import AuthProvider from "@/providers/auth.provider";
 
 export default function RootLayout() {
   return (
-    <main>
-      <Outlet />
-    </main>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <main>
+            <Outlet />
+          </main>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
