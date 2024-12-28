@@ -1,4 +1,4 @@
-import SignInModal from "@/components/auth/sign-in-modal";
+import AuthModal from "@/components/auth/auth-modal";
 import PlatformStatus from "@/components/platform-status";
 import { useAuth } from "@/hooks/auth.hook";
 import ToggleTheme from "@/components/toggle-theme";
@@ -18,12 +18,12 @@ export default function Header() {
         <div className="flex items-center justify-center gap-2">
           {signedIn && user && <UserDropdown user={user} />}
           {!signedIn && (
-            <SignInModal open={signInOpen} setOpen={setSignInOpen}>
+            <AuthModal open={signInOpen} setOpen={setSignInOpen}>
               <Button variant="ghost" size="sm">
                 <LogIn className="h-4 w-4" />
                 <p>Entrar</p>
               </Button>
-            </SignInModal>
+            </AuthModal>
           )}
         </div>
         <div className="flex items-center gap-2">

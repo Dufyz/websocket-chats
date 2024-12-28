@@ -1,9 +1,13 @@
 import { AuthContext } from "@/contexts/auth.context";
-import { signInSchema, SignInSchema } from "@/schemas/auth.schema";
+import {
+  signInSchema,
+  SignInSchema,
+  signUpSchema,
+  SignUpSchema,
+} from "@/schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { v4 } from "uuid";
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -20,14 +24,32 @@ export function useSignIn() {
     resolver: zodResolver(signInSchema),
     mode: "onChange",
     defaultValues: {
-      id: v4(),
       name: "",
+      password: "",
     },
   });
 
   return {
     form,
     signIn,
+  };
+}
+
+export function useSignUp() {
+  const { signUp } = useAuth();
+
+  const form = useForm<SignUpSchema>({
+    resolver: zodResolver(signUpSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      password: "",
+    },
+  });
+
+  return {
+    form,
+    signUp,
   };
 }
 

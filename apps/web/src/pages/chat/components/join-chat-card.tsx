@@ -4,10 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { Chat } from "@/types/chat.type";
 import { useAuth } from "@/hooks/auth.hook";
-import SignInModal from "../../../components/auth/sign-in-modal";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useJoinChat } from "../hooks/chat-actions.hook";
+import AuthModal from "../../../components/auth/auth-modal";
 
 interface JoinChatCardProps {
   chat: Chat;
@@ -115,7 +115,7 @@ export default function JoinChatCard({ chat }: JoinChatCardProps) {
         </div>
       )}
 
-      <SignInModal open={signInOpen} setOpen={setSignInOpen} />
+      <AuthModal open={signInOpen} setOpen={setSignInOpen} />
     </div>
   );
 }

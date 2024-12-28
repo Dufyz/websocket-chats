@@ -5,13 +5,19 @@ import ReactDOM from "react-dom/client";
 import React from "react";
 import HomePage from "./pages/home/home.page.tsx";
 import ChatPage from "./pages/chat/chat.page.tsx";
+import AuthLayout from "./layouts/auth.layout.tsx";
 
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      { element: <HomePage />, path: "/" },
-      { element: <ChatPage />, path: "/chat/:id" },
+      {
+        element: <AuthLayout />,
+        children: [
+          { element: <HomePage />, path: "/" },
+          { element: <ChatPage />, path: "/chat/:id" },
+        ],
+      },
     ],
   },
 ]);

@@ -22,13 +22,15 @@ export function UserDropdown({ user }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage
-              src="https://avatars.githubusercontent.com/u/21347264?v=4"
-              alt={user.name}
-            />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+        <Button
+          variant="ghost"
+          size={"icon"}
+          className="rounded-full flex items-center justify-center"
+        >
+          <Avatar className="w-8 h-8">
+            <AvatarFallback className="text-base bg-emerald-500">
+              {user.name?.charAt(0)}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

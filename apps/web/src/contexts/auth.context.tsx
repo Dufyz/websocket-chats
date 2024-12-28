@@ -1,12 +1,17 @@
-import { SignInSchema } from "@/schemas/auth.schema";
+import { SignInSchema, SignUpSchema } from "@/schemas/auth.schema";
 import { User } from "@/types/user.type";
-import { createContext } from "react";
+import { createContext, Dispatch, SetStateAction } from "react";
 
 interface AuthContextData {
+  authModalOpen: boolean;
+  setAuthModalOpen: Dispatch<SetStateAction<boolean>>;
   user: User | undefined;
   signedIn: boolean;
-  signIn(data: SignInSchema): void;
+  isLoading: boolean;
+  signIn(data: SignInSchema): Promise<void>;
+  signUp(data: SignUpSchema): Promise<void>;
   signOut(): void;
+  verifyToken(): Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextData>(

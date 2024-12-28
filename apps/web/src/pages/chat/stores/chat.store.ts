@@ -8,18 +8,21 @@ const dummyUsers: User[] = [
   {
     id: v4(),
     name: "Alice",
+    password: v4(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: v4(),
     name: "Bob",
+    password: v4(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: v4(),
     name: "Charlie",
+    password: v4(),
     created_at: new Date(),
     updated_at: new Date(),
   },
@@ -54,7 +57,7 @@ const dummyMessages: Message[] = [
 
 const dummyChats: Chat[] = [
   {
-    id: v4(),
+    id: "fbd152bf-3f5d-476b-8c67-861dcac17df6",
     name: "Tech Talks",
     description: "Discuss the latest in technology",
     category: "Technology",
@@ -63,7 +66,7 @@ const dummyChats: Chat[] = [
     admin_user_id: dummyUsers[0].id,
   },
   {
-    id: v4(),
+    id: "2d04ef83-deaf-4034-8179-95040ef39fb8",
     name: "Gaming Lounge",
     description: "Find gaming partners and discuss strategies",
     category: "Gaming",
@@ -72,7 +75,7 @@ const dummyChats: Chat[] = [
     admin_user_id: dummyUsers[0].id,
   },
   {
-    id: v4(),
+    id: "d8ac6da6-c340-4be9-b249-b099941d5ce6",
     name: "Music Production",
     description: "Share and discuss music production techniques",
     category: "Music",

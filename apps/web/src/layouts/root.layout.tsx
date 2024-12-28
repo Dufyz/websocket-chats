@@ -10,9 +10,7 @@ export default function RootLayout() {
     <ThemeProvider>
       <AuthProvider>
         <TooltipProvider>
-          <main>
-            <Outlet />
-          </main>
+          <Outlet />
         </TooltipProvider>
       </AuthProvider>
     </ThemeProvider>

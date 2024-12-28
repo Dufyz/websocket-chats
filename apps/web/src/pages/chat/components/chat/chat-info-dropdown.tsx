@@ -96,7 +96,6 @@ function OverviewTab({ chat, isAdmin, handleLeaveChat }: OverviewTabProps) {
     <div className="w-[350px] h-full flex flex-col items-center">
       <div className="w-full p-6 flex flex-col items-center text-center border-b dark:border-zinc-800">
         <Avatar className="w-28 h-28 mb-4">
-          {/* <AvatarImage src={chat.avatar_url} /> */}
           <AvatarFallback className="text-4xl bg-emerald-500">
             {chat.name?.charAt(0)}
           </AvatarFallback>
