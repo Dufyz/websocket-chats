@@ -11,11 +11,15 @@ import (
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var logger *zap.Logger
 
 func init() {
+	core := zapcore.NewCore(zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()), zapcore.AddSync(os.Stdout), zap.InfoLevel)
+	logger = zap.New(core)
+
 	envPath := filepath.Join("..", ".env")
 	if _, err := os.Stat(envPath); err == nil {
 		if err := godotenv.Load(envPath); err != nil {
@@ -29,6 +33,8 @@ func init() {
 	requiredEnvVars := []string{
 		"DB_URL",
 		"WEB_URL",
+		"API_PORT",
+		"JWT_KEY",
 	}
 
 	for _, envVar := range requiredEnvVars {
@@ -55,7 +61,7 @@ func main() {
 	}))
 	e.Use(echoMiddleware.Recover())
 
-	routes.UseRoutes(e)
+	routes.UseRoutes(e, dbConnection)
 
 	port := os.Getenv("API_PORT")
 	if port == "" {

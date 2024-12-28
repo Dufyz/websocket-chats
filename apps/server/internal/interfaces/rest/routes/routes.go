@@ -1,14 +1,17 @@
 package routes
 
 import (
-	"server/internal/interfaces/rest/controller"
+	"database/sql"
+	"server/internal/interfaces/rest/middleware"
 
 	"github.com/labstack/echo/v4"
 )
 
-func UseRoutes(e *echo.Echo) {
+func UseRoutes(e *echo.Echo, db *sql.DB) {
 	api := e.Group("/api")
+	authenticatedApi := api.Group("")
+	authenticatedApi.Use(middleware.AuthMiddleware())
 
-	WebsocketController := controller.NewWebsocketController()
-	api.GET("/web-socket", WebsocketController.HandleConnection)
+	WebsocketRoutes(api)
+	UserRoutes(api, authenticatedApi, db)
 }

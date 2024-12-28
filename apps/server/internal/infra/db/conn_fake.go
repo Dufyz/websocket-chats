@@ -21,7 +21,7 @@ func ConnectDBTest(t *testing.T) (*sql.DB, error) {
 	ctx := context.Background()
 
 	currentDir, _ := os.Getwd()
-	migrationsDir := filepath.Join(currentDir, "..", "..", "..", "internal", "infra", "db", "migrations", "up")
+	migrationsDir := filepath.Join(currentDir, "..", "..", "..", "infra", "db", "migrations", "up")
 
 	pgContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("postgres:15.3-alpine"),
