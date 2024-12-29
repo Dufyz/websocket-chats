@@ -11,12 +11,12 @@ post {
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU0MDI1NjYsInVzZXJfaWQiOjF9.7keNnQn3XrMbIErbZccUfDAtxuOX9Usemk-113JoLrs
+  token: {{AUTH_TOKEN}}
 }
 
 body:json {
   {
-    "chat_id": 1,
+    "chat_id": 1000,
     "user_id": 1,
     "message": "Test message"
   }

@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{api_url}}/chats?cursor=null&limit=10&search=teste
+  url: {{api_url}}/chats?limit=10
   body: none
   auth: none
 }
 
 params:query {
-  cursor: null
   limit: 10
-  search: teste
+  ~cursor: null
+  ~search: teste
 }

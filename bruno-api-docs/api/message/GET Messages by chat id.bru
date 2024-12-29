@@ -5,11 +5,20 @@ meta {
 }
 
 get {
-  url: {{api_url}}/messages/chat/:chat_id
+  url: {{api_url}}/messages/chat/:chat_id?limit=30&cursor=null
   body: none
-  auth: none
+  auth: bearer
+}
+
+params:query {
+  limit: 30
+  cursor: null
 }
 
 params:path {
-  chat_id: 1
+  chat_id: 9
+}
+
+auth:bearer {
+  token: {{AUTH_TOKEN}}
 }
