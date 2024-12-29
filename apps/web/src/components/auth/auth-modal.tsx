@@ -49,7 +49,7 @@ export default function AuthModal({ open, setOpen, children }: AuthModalProps) {
       await signIn(data);
       setOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -58,7 +58,7 @@ export default function AuthModal({ open, setOpen, children }: AuthModalProps) {
       await signUp(data);
       setOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

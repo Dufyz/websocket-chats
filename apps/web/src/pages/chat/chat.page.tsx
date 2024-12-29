@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/auth.hook";
 import { useCreateMessage } from "@/pages/chat/hooks/message-actions.hook";
 import { useChatStore } from "@/pages/chat/stores/chat.store";
 import { v4 } from "uuid";
-import { User } from "@/types/user.type";
 import { Chat } from "./components/chat";
 import { Chat as TypeChat } from "@/types/chat.type";
 
@@ -16,9 +15,8 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const chats = useChatStore((state) => state.chats);
-  const chat = chats.find((c) => c.id === chatId) as TypeChat;
-  const messages = useMemo(() => chat.messages || [], [chat.messages]);
-  const users = [...(chat.users || []), user as User];
+  const chat = chats.find((c) => c.id === Number(chatId)) as TypeChat;
+  const messages = useMemo(() => chat?.messages || [], [chat.messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -55,11 +53,7 @@ export default function ChatPage() {
     <div className="flex h-screen bg-gray-900 text-white">
       <div className="flex-1 flex flex-col">
         <Chat.Header chat={chat} />
-        <Chat.ChatArea
-          messages={messages}
-          users={users}
-          messagesEndRef={messagesEndRef}
-        />
+        <Chat.ChatArea messages={messages} messagesEndRef={messagesEndRef} />
         <Chat.InputArea onSend={handleSendMessage} />
       </div>
     </div>

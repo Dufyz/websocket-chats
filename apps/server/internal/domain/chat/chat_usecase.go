@@ -1,9 +1,5 @@
 package chat
 
-import (
-	"server/internal/interfaces/dto"
-)
-
 type ChatUsecase struct {
 	repository ChatRepositoryInterface
 }
@@ -22,15 +18,15 @@ func (uc *ChatUsecase) GetChatsByUserId(userId int64) ([]Chat, error) {
 	return uc.repository.GetChatsByUserId(userId)
 }
 
-func (uc *ChatUsecase) GetChats() ([]Chat, error) {
-	return uc.repository.GetChats()
+func (uc *ChatUsecase) GetChats(body GetChatsRequest) (GetChatsResponse, error) {
+	return uc.repository.GetChats(body)
 }
 
-func (uc *ChatUsecase) PostChat(body dto.PostChat) (*Chat, error) {
+func (uc *ChatUsecase) PostChat(body PostChatRequest) (*Chat, error) {
 	return uc.repository.PostChat(body)
 }
 
-func (uc *ChatUsecase) PatchChat(chatId int64, body dto.PatchChat) (*Chat, error) {
+func (uc *ChatUsecase) PatchChat(chatId int64, body PatchChatRequest) (*Chat, error) {
 	return uc.repository.PatchChat(chatId, body)
 }
 

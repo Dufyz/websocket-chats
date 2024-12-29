@@ -1,7 +1,7 @@
 export type Message = {
-  id: string;
-  chat_id: string;
-  user_id: string;
+  id: number;
+  chat_id: number;
+  user_id: number;
   message: string;
   created_at: Date;
   updated_at: Date;

@@ -3,15 +3,22 @@ import { z } from "zod";
 
 export const chatSchema = z.object({
   id: z.string(),
-  admin_user_id: z.string().uuid(),
+  admin_user_id: z.number(),
   name: z.string(),
   description: z.string().nullable(),
-  category: z.enum(categories as [string, ...string[]]),
+  category: z
+    .string()
+    .refine((value) => categories.some((c) => c.value === value)),
   created_at: z.date(),
   updated_at: z.date(),
 });
 
-export const createChatSchema = chatSchema;
+export const createChatSchema = chatSchema.pick({
+  admin_user_id: true,
+  name: true,
+  description: true,
+  category: true,
+});
 
 export const updateChatSchema = chatSchema
   .pick({

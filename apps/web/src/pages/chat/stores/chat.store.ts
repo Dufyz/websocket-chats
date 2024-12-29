@@ -1,106 +1,36 @@
 import { Chat } from "@/types/chat.type";
 import { Message } from "@/types/message.type";
-import { User } from "@/types/user.type";
-import { v4 } from "uuid";
 import { create } from "zustand";
-
-const dummyUsers: User[] = [
-  {
-    id: v4(),
-    name: "Alice",
-    password: v4(),
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: v4(),
-    name: "Bob",
-    password: v4(),
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: v4(),
-    name: "Charlie",
-    password: v4(),
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-];
-
-const dummyMessages: Message[] = [
-  {
-    id: v4(),
-    chat_id: v4(),
-    user_id: dummyUsers[0].id,
-    message: "Hey everyone!",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: v4(),
-    chat_id: v4(),
-    user_id: dummyUsers[1].id,
-    message: "Hi Alice, how are you?",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: v4(),
-    chat_id: v4(),
-    user_id: dummyUsers[2].id,
-    message: "Hello folks!",
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-];
-
-const dummyChats: Chat[] = [
-  {
-    id: "fbd152bf-3f5d-476b-8c67-861dcac17df6",
-    name: "Tech Talks",
-    description: "Discuss the latest in technology",
-    category: "Technology",
-    users: dummyUsers,
-    messages: dummyMessages,
-    admin_user_id: dummyUsers[0].id,
-  },
-  {
-    id: "2d04ef83-deaf-4034-8179-95040ef39fb8",
-    name: "Gaming Lounge",
-    description: "Find gaming partners and discuss strategies",
-    category: "Gaming",
-    users: dummyUsers,
-    messages: dummyMessages,
-    admin_user_id: dummyUsers[0].id,
-  },
-  {
-    id: "d8ac6da6-c340-4be9-b249-b099941d5ce6",
-    name: "Music Production",
-    description: "Share and discuss music production techniques",
-    category: "Music",
-    users: dummyUsers,
-    messages: dummyMessages,
-    admin_user_id: dummyUsers[0].id,
-  },
-];
 
 type ChatStore = {
   chats: Chat[];
 
+  setChats: (chats: Chat[]) => void;
+
   create: (chat: Chat) => void;
   update: (chat: Partial<Chat>) => void;
-  delete: (id: string) => void;
-  joinChat: (chatId: string, user: User) => void;
-  leaveChat: (chatId: string, userId: string) => void;
+  delete: (id: number) => void;
 
-  createMessage: (chatId: string, message: Message) => void;
-  updateMessage: (chatId: string, messageId: string, message: string) => void;
-  deleteMessage: (chatId: string, messageId: string) => void;
+  createMessage: (chatId: number, message: Message) => void;
+  updateMessage: (chatId: number, messageId: number, message: string) => void;
+  deleteMessage: (chatId: number, messageId: number) => void;
 };
 
 export const useChatStore = create<ChatStore>((set) => ({
-  chats: dummyChats,
+  chats: [],
+
+  setChats: (chats) =>
+    set((state) => ({
+      chats: chats.reduce((acc, chat) => {
+        const index = acc.findIndex((c) => c.id === chat.id);
+        if (index !== -1) {
+          acc[index] = { ...acc[index], ...chat };
+        } else {
+          acc = [...acc, chat];
+        }
+        return acc;
+      }, state.chats),
+    })),
 
   create: (chat) =>
     set((state) => ({
@@ -115,30 +45,6 @@ export const useChatStore = create<ChatStore>((set) => ({
   delete: (id) =>
     set((state) => ({
       chats: state.chats.filter((c) => c.id !== id),
-    })),
-
-  joinChat: (chatId, user) =>
-    set((state) => ({
-      chats: state.chats.map((c) =>
-        c.id === chatId
-          ? {
-              ...c,
-              users: [...(c.users || []), user],
-            }
-          : c
-      ),
-    })),
-
-  leaveChat: (chatId, userId) =>
-    set((state) => ({
-      chats: state.chats.map((c) =>
-        c.id === chatId
-          ? {
-              ...c,
-              users: (c.users || []).filter((u) => u.id !== userId),
-            }
-          : c
-      ),
     })),
 
   createMessage: (chatId, message) =>

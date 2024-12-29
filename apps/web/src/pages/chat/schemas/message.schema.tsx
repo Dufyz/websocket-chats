@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const messageSchema = z.object({
   id: z.string(),
-  chat_id: z.string().uuid(),
-  user_id: z.string().uuid(),
+  chat_id: z.number(),
+  user_id: z.number(),
   message: z.string(),
   created_at: z.date(),
   updated_at: z.date(),

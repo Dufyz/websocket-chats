@@ -6,26 +6,28 @@ import {
   UpdateChatSchema,
 } from "@/pages/chat/schemas/chat.schema";
 import { useChatStore } from "@/pages/chat/stores/chat.store";
+import {
+  deleteChat as queryDeleteChat,
+  postChat,
+  patchChat,
+} from "@/queries/chat.queries";
 import { Chat } from "@/types/chat.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { v4 } from "uuid";
+import { useNavigate } from "react-router-dom";
 
 export function useCreateChat() {
   const { user } = useAuth();
+
   const createChatStore = useChatStore((state) => state.create);
-  const joinChatStore = useChatStore((state) => state.joinChat);
 
   const defaultValues: CreateChatSchema = useMemo(
     () => ({
-      id: v4(),
-      admin_user_id: user?.id ?? "",
+      admin_user_id: user?.id ?? -1,
       name: "",
-      category: "Bate-papo",
+      category: "chat",
       description: null,
-      created_at: new Date(),
-      updated_at: new Date(),
     }),
     [user]
   );
@@ -36,13 +38,20 @@ export function useCreateChat() {
     defaultValues,
   });
 
-  function createChat(data: CreateChatSchema) {
-    if (!user) return;
+  async function createChat(data: CreateChatSchema): Promise<Chat | undefined> {
+    try {
+      if (!user) return;
 
-    createChatStore(data);
-    joinChatStore(data.id, user);
+      const { chat } = await postChat(data);
 
-    form.reset(defaultValues);
+      createChatStore(chat);
+
+      form.reset(defaultValues);
+
+      return chat;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   useEffect(() => {
@@ -61,8 +70,14 @@ export function useUpdateChat({ chat }: { chat: Chat }) {
     values: chat,
   });
 
-  function updateChat(data: UpdateChatSchema) {
-    updateChatStore(data);
+  async function updateChat(data: UpdateChatSchema) {
+    try {
+      const { chat: updatedChat } = await patchChat(chat.id, data);
+
+      updateChatStore(updatedChat);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return { form, updateChat };
@@ -70,36 +85,19 @@ export function useUpdateChat({ chat }: { chat: Chat }) {
 
 export function useDeleteChat() {
   const deleteChatStore = useChatStore((state) => state.delete);
+  const navigate = useNavigate();
 
-  function deleteChat(id: string) {
-    deleteChatStore(id);
+  async function deleteChat(id: number) {
+    try {
+      await queryDeleteChat(id);
+
+      navigate("/");
+
+      deleteChatStore(id);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return { deleteChat };
-}
-
-export function useJoinChat() {
-  const { user } = useAuth();
-  const joinChatStore = useChatStore((state) => state.joinChat);
-
-  function joinChat(chatId: string) {
-    if (!user) return;
-
-    joinChatStore(chatId, user);
-  }
-
-  return { joinChat };
-}
-
-export function useLeaveChat() {
-  const { user } = useAuth();
-  const leaveChatStore = useChatStore((state) => state.leaveChat);
-
-  function leaveChat(chatId: string, userId: string) {
-    if (!user) return;
-
-    leaveChatStore(chatId, userId);
-  }
-
-  return { leaveChat };
 }

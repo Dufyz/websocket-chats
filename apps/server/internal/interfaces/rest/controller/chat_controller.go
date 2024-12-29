@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 	"server/internal/domain/chat"
-	"server/internal/interfaces/dto"
 	"server/internal/utils"
+	"strconv"
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -68,7 +68,60 @@ func (cc *chatController) GetChatsByUserId(ctx echo.Context) error {
 }
 
 func (cc *chatController) GetChats(ctx echo.Context) error {
-	chats, err := cc.chatUsecase.GetChats()
+	var cursor *int64
+	var limit *int
+	var search *string
+
+	query := ctx.QueryParam("cursor")
+	if query == "null" {
+		cursor = nil
+	}
+	if query != "" && query != "null" {
+		parsedCursor, err := strconv.ParseInt(query, 10, 64)
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Cursor must be a valid integer!",
+			})
+		}
+		if parsedCursor < 0 {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Cursor must be a positive integer!",
+			})
+		}
+		cursor = &parsedCursor
+	}
+
+	query = ctx.QueryParam("limit")
+	if query == "null" {
+		limit = nil
+	}
+	if query != "" && query != "null" {
+		parsedLimit, err := strconv.Atoi(query)
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Limit must be a valid integer!",
+			})
+		}
+		if parsedLimit < 0 {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Limit must be a positive integer!",
+			})
+		}
+		limit = &parsedLimit
+	}
+
+	query = ctx.QueryParam("search")
+	if query == "" {
+		search = nil
+	} else {
+		search = &query
+	}
+
+	data, err := cc.chatUsecase.GetChats(chat.GetChatsRequest{
+		Search: search,
+		Cursor: cursor,
+		Limit:  limit,
+	})
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
@@ -76,12 +129,12 @@ func (cc *chatController) GetChats(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
-		"chats": chats,
+		"data": data,
 	})
 }
 
 func (cc *chatController) PostChat(ctx echo.Context) error {
-	var body dto.PostChat
+	var body chat.PostChatRequest
 	validate := validator.New()
 
 	if err := ctx.Bind(&body); err != nil {
@@ -116,7 +169,7 @@ func (cc *chatController) PostChat(ctx echo.Context) error {
 }
 
 func (cc *chatController) PatchChat(ctx echo.Context) error {
-	var body dto.PatchChat
+	var body chat.PatchChatRequest
 	validate := validator.New()
 
 	chatId, errorMessage := utils.GetInt64Param(ctx, "chat_id")

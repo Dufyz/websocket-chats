@@ -22,16 +22,22 @@ import { useCreateChat } from "@/pages/chat/hooks/chat-actions.hook";
 import { Controller } from "react-hook-form";
 import { CreateChatSchema } from "@/pages/chat/schemas/chat.schema";
 import { useAuth } from "@/hooks/auth.hook";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateChatModal() {
   const { signedIn } = useAuth();
   const { createChat, form } = useCreateChat();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
 
-  function onSubmit(data: CreateChatSchema) {
-    createChat(data);
+  async function onSubmit(data: CreateChatSchema) {
+    const chat = await createChat(data);
+    if (!chat) return;
+
     setOpen(false);
+
+    navigate(`/chat/${chat.id}`);
   }
 
   if (!signedIn) return null;

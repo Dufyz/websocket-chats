@@ -11,3 +11,9 @@ type Chat struct {
 	Created_at    time.Time `json:"created_at"`
 	Updated_at    time.Time `json:"updated_at"`
 }
+
+type ChatWithStats struct {
+	Chat           Chat `json:"chat"`
+	Total_users    int  `json:"total_users"`
+	Total_messages int  `json:"total_messages"`
+}

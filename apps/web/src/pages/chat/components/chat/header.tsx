@@ -12,8 +12,7 @@ interface HeaderProps {
 export default function Header({ chat }: HeaderProps) {
   const navigate = useNavigate();
 
-  const users = chat.users || [];
-  const usersLength = users.length || 0;
+  const totalUsers = chat.total_users || 0;
 
   const handleBackToHome = useCallback(() => {
     navigate("/");
@@ -35,7 +34,7 @@ export default function Header({ chat }: HeaderProps) {
             {chat.name}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {usersLength} participante{usersLength > 1 && "s"}
+            {totalUsers} participante{totalUsers > 1 && "s"}
           </p>
         </div>
       </div>
