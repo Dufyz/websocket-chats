@@ -7,22 +7,19 @@ import {
   useDeleteMessage,
   useUpdateMessage,
 } from "../../hooks/message-actions.hook";
+import { useAuth } from "@/hooks/auth.hook";
 
 interface MessageBubbleProps {
   message: Message;
   user: User;
-  currentUser: User;
 }
 
-export function MessageBubble({
-  message,
-  user,
-  currentUser,
-}: MessageBubbleProps) {
+export function MessageBubble({ message, user }: MessageBubbleProps) {
+  const { user: loggedInUser } = useAuth();
   const { updateMessage } = useUpdateMessage();
   const { deleteMessage } = useDeleteMessage();
 
-  const isOwnMessage = message.user_id === currentUser.id;
+  const isOwnMessage = message.user_id === loggedInUser?.id;
 
   const handleCopyMessage = () => {
     navigator.clipboard.writeText(message.message);

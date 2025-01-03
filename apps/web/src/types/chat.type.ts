@@ -1,4 +1,5 @@
 import { Message } from "./message.type";
+import { User } from "./user.type";
 
 export type Chat = {
   id: number;
@@ -8,6 +9,7 @@ export type Chat = {
   description: string | null;
 
   messages?: Message[];
+  users?: User[];
 
   total_users?: number;
   total_messages?: number;

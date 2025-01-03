@@ -35,7 +35,7 @@ func TestRepositoryDeleteMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 
-	postChat := dto.PostChat{
+	postChat := chat.PostChatRequest{
 		Admin_user_id: user.ID,
 		Name:          "Test Chat",
 		Category:      "chat",
@@ -46,7 +46,7 @@ func TestRepositoryDeleteMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, chat)
 
-	postMessage := dto.PostMessage{
+	postMessage := message.PostMessageRequest{
 		Chat_id: chat.ID,
 		User_id: user.ID,
 		Message: "Test Message",

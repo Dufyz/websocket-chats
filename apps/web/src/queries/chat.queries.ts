@@ -4,6 +4,7 @@ import {
   UpdateChatSchema,
 } from "@/pages/chat/schemas/chat.schema";
 import { Chat } from "@/types/chat.type";
+import { User } from "@/types/user.type";
 
 export async function getChats(
   search: string = "",
@@ -13,6 +14,7 @@ export async function getChats(
   data: {
     chats: {
       chat: Chat;
+      users: User[];
       total_users: number;
       total_messages: number;
     }[];

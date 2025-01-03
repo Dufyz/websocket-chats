@@ -1,6 +1,9 @@
 package chat
 
-import "time"
+import (
+	"server/internal/domain/user"
+	"time"
+)
 
 type Chat struct {
 	ID            int64     `json:"id"`
@@ -13,7 +16,8 @@ type Chat struct {
 }
 
 type ChatWithStats struct {
-	Chat           Chat `json:"chat"`
-	Total_users    int  `json:"total_users"`
-	Total_messages int  `json:"total_messages"`
+	Chat           Chat        `json:"chat"`
+	Users          []user.User `json:"users"`
+	Total_users    int         `json:"total_users"`
+	Total_messages int         `json:"total_messages"`
 }

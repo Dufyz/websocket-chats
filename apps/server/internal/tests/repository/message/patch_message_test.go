@@ -35,7 +35,7 @@ func TestRepositoryPatchMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 
-	postChat := dto.PostChat{
+	postChat := chat.PostChatRequest{
 		Admin_user_id: user.ID,
 		Name:          "Test Chat",
 		Category:      "chat",
@@ -46,18 +46,18 @@ func TestRepositoryPatchMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, chat)
 
-	postMessage := dto.PostMessage{
+	postMessage := message.PostMessageRequest{
 		Chat_id: chat.ID,
 		User_id: user.ID,
 		Message: "Test Message",
 	}
 
-	message, err := messageRepo.PostMessage(postMessage)
-	assert.NoError(t, err)
-
-	patchMessage := dto.PatchMessage{
+	patchMessage := message.PatchMessageRequest{
 		Message: "Test Message Patched",
 	}
+
+	message, err := messageRepo.PostMessage(postMessage)
+	assert.NoError(t, err)
 
 	message, err = messageRepo.PatchMessage(message.ID, patchMessage)
 	assert.NoError(t, err)

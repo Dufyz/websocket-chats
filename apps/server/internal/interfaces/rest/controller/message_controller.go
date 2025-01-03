@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 	"server/internal/domain/message"
-	"server/internal/interfaces/dto"
 	"server/internal/utils"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -20,6 +20,9 @@ func NewMessageController(messageUsecase message.MessageUsecase) messageControll
 }
 
 func (mc *messageController) GetMessagesByChatId(ctx echo.Context) error {
+	var cursor *int64
+	var limit *int
+
 	chatId, errorMessage := utils.GetInt64Param(ctx, "chat_id")
 	if errorMessage != "" {
 		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -27,7 +30,49 @@ func (mc *messageController) GetMessagesByChatId(ctx echo.Context) error {
 		})
 	}
 
-	messages, err := mc.messageUsecase.GetMessagesByChatId(chatId)
+	query := ctx.QueryParam("cursor")
+	if query == "null" {
+		cursor = nil
+	}
+	if query != "" && query != "null" {
+		parsedCursor, err := strconv.ParseInt(query, 10, 64)
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Cursor must be a valid integer!",
+			})
+		}
+		if parsedCursor < 0 {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Cursor must be a positive integer!",
+			})
+		}
+		cursor = &parsedCursor
+	}
+
+	query = ctx.QueryParam("limit")
+	if query == "null" {
+		limit = nil
+	}
+	if query != "" && query != "null" {
+		parsedLimit, err := strconv.Atoi(query)
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Limit must be a valid integer!",
+			})
+		}
+		if parsedLimit < 0 {
+			return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Limit must be a positive integer!",
+			})
+		}
+		limit = &parsedLimit
+	}
+
+	messages, err := mc.messageUsecase.GetMessagesByChatId(message.GetMessagesRequest{
+		Chat_id: chatId,
+		Cursor:  cursor,
+		Limit:   limit,
+	})
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
@@ -35,12 +80,12 @@ func (mc *messageController) GetMessagesByChatId(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
-		"messages": messages,
+		"data": messages,
 	})
 }
 
 func (mc *messageController) PostMessage(ctx echo.Context) error {
-	var body dto.PostMessage
+	var body message.PostMessageRequest
 	if err := ctx.Bind(&body); err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": err.Error(),
@@ -67,7 +112,7 @@ func (mc *messageController) PatchMessage(ctx echo.Context) error {
 		})
 	}
 
-	var body dto.PatchMessage
+	var body message.PatchMessageRequest
 	if err := ctx.Bind(&body); err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": err.Error(),

@@ -5,7 +5,7 @@ import CreateChatModal from "@/pages/chat/components/create-chat-modal";
 import Header from "./components/header";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import useGetChats from "../chat/hooks/chat-fetchs.hook";
+import { useGetChats } from "../chat/hooks/chat-fetchs.hook";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 

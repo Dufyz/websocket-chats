@@ -9,7 +9,11 @@ export const messageSchema = z.object({
   updated_at: z.date(),
 });
 
-export const createMessageSchema = messageSchema;
+export const createMessageSchema = messageSchema.pick({
+  chat_id: true,
+  user_id: true,
+  message: true,
+});
 
 export const updateMessageSchema = messageSchema.pick({
   message: true,

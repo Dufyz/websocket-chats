@@ -1,20 +1,52 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Smile, Paperclip } from "lucide-react";
+import { Chat } from "@/types/chat.type";
+import { useAuth } from "@/hooks/auth.hook";
+import { useCreateMessage } from "../../hooks/message-actions.hook";
 
 interface InputAreaProps {
-  onSend: (message: string) => void;
+  chat: Chat;
+  messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
-export default function InputArea({ onSend }: InputAreaProps) {
+export default function InputArea({ chat, messagesEndRef }: InputAreaProps) {
+  const { user } = useAuth();
+  const { createMessage } = useCreateMessage();
+
   const [inputMessage, setInputMessage] = useState("");
 
-  const handleSendMessage = () => {
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({
+      inline: "end",
+      block: "end",
+      behavior: "instant",
+    });
+  }, [messagesEndRef]);
+
+  async function handleSendMessage() {
+    if (!user) return;
     if (!inputMessage.trim()) return;
-    onSend(inputMessage);
+
+    await createMessage({
+      chat_id: chat.id,
+      user_id: user.id,
+      message: inputMessage,
+    });
+
     setInputMessage("");
-  };
+
+    scrollToBottom();
+  }
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [messagesEndRef, chat.id, scrollToBottom]);
 
   return (
     <div className="px-4 py-2 bg-white dark:bg-[#202C33] border-t border-gray-200 dark:border-gray-700 flex items-center gap-4">

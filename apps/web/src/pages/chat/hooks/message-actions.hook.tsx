@@ -1,14 +1,37 @@
+import { useChatStore } from "@/pages/chat/stores/chat.store";
+import {
+  patchMessage,
+  postMessage,
+  deleteMessage as queryDeleteMessage,
+} from "@/queries/message.queries";
 import {
   CreateMessageSchema,
   UpdateMessageSchema,
-} from "@/pages/chat/schemas/message.schema";
-import { useChatStore } from "@/pages/chat/stores/chat.store";
+} from "../schemas/message.schema";
+import { useAuth } from "@/hooks/auth.hook";
 
 export function useCreateMessage() {
+  const { user } = useAuth();
+  const chats = useChatStore((state) => state.chats);
   const createMessageStore = useChatStore((state) => state.createMessage);
+  const addUserToChat = useChatStore((state) => state.addUserToChat);
 
-  function createMessage(data: CreateMessageSchema) {
-    createMessageStore(data.chat_id, data);
+  async function createMessage(data: CreateMessageSchema) {
+    if (!user) return;
+    const { message } = await postMessage(data);
+
+    createMessageStore(message.chat_id, message);
+
+    const chat = chats.find((chat) => chat.id === message.chat_id);
+    const chatUsers = chat?.users || [];
+
+    const isUserAlreadyInChat = chatUsers.some(
+      (user) => user.id === data.user_id
+    );
+
+    if (isUserAlreadyInChat) return;
+
+    addUserToChat(message.chat_id, user);
   }
 
   return { createMessage };
@@ -17,12 +40,14 @@ export function useCreateMessage() {
 export function useUpdateMessage() {
   const updateMessageStore = useChatStore((state) => state.updateMessage);
 
-  function updateMessage(
-    chatId: string,
-    messageId: string,
+  async function updateMessage(
+    chatId: number,
+    messageId: number,
     data: UpdateMessageSchema
   ) {
     updateMessageStore(chatId, messageId, data.message);
+
+    await patchMessage(messageId, data);
   }
 
   return { updateMessage };
@@ -31,8 +56,10 @@ export function useUpdateMessage() {
 export function useDeleteMessage() {
   const deleteMessageStore = useChatStore((state) => state.deleteMessage);
 
-  function deleteMessage(chatId: string, messageId: string) {
+  async function deleteMessage(chatId: number, messageId: number) {
     deleteMessageStore(chatId, messageId);
+
+    await queryDeleteMessage(messageId);
   }
 
   return { deleteMessage };

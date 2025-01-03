@@ -1,7 +1,5 @@
 package message
 
-import "server/internal/interfaces/dto"
-
 type MessageUsecase struct {
 	repository MessageRepositoryInterface
 }
@@ -12,15 +10,15 @@ func NewMessageUsecase(repository MessageRepositoryInterface) MessageUsecase {
 	}
 }
 
-func (uc *MessageUsecase) GetMessagesByChatId(chatId int64) ([]Message, error) {
-	return uc.repository.GetMessagesByChatId(chatId)
+func (uc *MessageUsecase) GetMessagesByChatId(body GetMessagesRequest) (GetMessagesResponse, error) {
+	return uc.repository.GetMessagesByChatId(body)
 }
 
-func (uc *MessageUsecase) PostMessage(body dto.PostMessage) (*Message, error) {
+func (uc *MessageUsecase) PostMessage(body PostMessageRequest) (*Message, error) {
 	return uc.repository.PostMessage(body)
 }
 
-func (uc *MessageUsecase) PatchMessage(messageId int64, body dto.PatchMessage) (*Message, error) {
+func (uc *MessageUsecase) PatchMessage(messageId int64, body PatchMessageRequest) (*Message, error) {
 	return uc.repository.PatchMessage(messageId, body)
 }
 

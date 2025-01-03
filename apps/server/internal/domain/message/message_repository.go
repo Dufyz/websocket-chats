@@ -2,7 +2,7 @@ package message
 
 import (
 	"database/sql"
-	"server/internal/interfaces/dto"
+	"fmt"
 
 	"go.uber.org/zap"
 )
@@ -17,42 +17,109 @@ func NewMessageRepository(connection *sql.DB) *MessageRepository {
 	}
 }
 
-func (mr *MessageRepository) GetMessagesByChatId(chatId int64) ([]Message, error) {
-	var messages []Message
+func (mr *MessageRepository) GetMessagesByChatId(body GetMessagesRequest) (GetMessagesResponse, error) {
+	var response GetMessagesResponse
+	var countQuery string
+	var dataQuery string
+	var args []interface{}
 
-	query, err := mr.connection.Prepare(`
+	// Query base para contar total de registros
+	countQuery = `
+		SELECT COUNT(*) 
+		FROM "messages" 
+		WHERE chat_id = $1
+	`
+
+	// Query base para buscar mensagens
+	dataQuery = `
 		SELECT id, chat_id, user_id, message, created_at, updated_at
 		FROM "messages"
 		WHERE chat_id = $1
-	`)
+	`
 
-	if err != nil {
-		zap.L().Error("Error preparing query Message/Repository/GetMessagesByChatId", zap.Error(err))
-		return nil, err
+	// Adiciona argumentos base
+	args = append(args, body.Chat_id)
+	argCount := 1
+
+	// Se tiver cursor, pega mensagens mais antigas (ids menores que o cursor)
+	if body.Cursor != nil {
+		dataQuery += fmt.Sprintf(" AND id < $%d", argCount+1)
+		countQuery += fmt.Sprintf(" AND id < $%d", argCount+1)
+		args = append(args, *body.Cursor)
+		argCount++
 	}
 
-	rows, err := query.Query(chatId)
-	if err != nil {
-		zap.L().Error("Error querying rows Message/Repository/GetMessagesByChatId", zap.Error(err))
-		return nil, err
+	// Ordena por ID decrescente para sempre pegar as mensagens mais recentes primeiro
+	dataQuery += " ORDER BY id DESC"
+
+	// Adiciona limite se fornecido
+	if body.Limit != nil {
+		dataQuery += fmt.Sprintf(" LIMIT $%d", argCount+1)
+		args = append(args, *body.Limit)
+	} else {
+		// Limite padrão de 50 registros
+		dataQuery += " LIMIT 50"
 	}
+
+	// Prepara e executa query de contagem
+	var total int64
+	err := mr.connection.QueryRow(countQuery, args[:len(args)-1]...).Scan(&total)
+	if err != nil {
+		zap.L().Error("Error counting messages", zap.Error(err))
+		return response, err
+	}
+
+	// Prepara e executa query principal
+	rows, err := mr.connection.Query(dataQuery, args...)
+	if err != nil {
+		zap.L().Error("Error querying messages", zap.Error(err))
+		return response, err
+	}
+	defer rows.Close()
+
+	var messages []Message
+	var lastID int64
 
 	for rows.Next() {
 		var message Message
-
-		err = rows.Scan(&message.ID, &message.Chat_id, &message.User_id, &message.Message, &message.Created_at, &message.Updated_at)
+		err = rows.Scan(
+			&message.ID,
+			&message.Chat_id,
+			&message.User_id,
+			&message.Message,
+			&message.Created_at,
+			&message.Updated_at,
+		)
 		if err != nil {
-			zap.L().Error("Error scanning row Message/Repository/GetMessagesByChatId", zap.Error(err))
-			return nil, err
+			zap.L().Error("Error scanning message row", zap.Error(err))
+			return response, err
 		}
-
 		messages = append(messages, message)
+		lastID = message.ID
 	}
 
-	return messages, nil
+	// Configura a resposta
+	response.Messages = messages
+	response.Pagination.Total = total
+
+	if body.Cursor != nil {
+		response.Pagination.Cursor = *body.Cursor
+	}
+
+	// Se retornou o número máximo de registros, provavelmente há mais mensagens antigas
+	limit := 50
+	if body.Limit != nil {
+		limit = *body.Limit
+	}
+
+	if len(messages) == limit {
+		response.Pagination.Next_cursor = &lastID
+	}
+
+	return response, nil
 }
 
-func (mr *MessageRepository) PostMessage(body dto.PostMessage) (*Message, error) {
+func (mr *MessageRepository) PostMessage(body PostMessageRequest) (*Message, error) {
 	var message Message
 
 	query, err := mr.connection.Prepare(`
@@ -75,7 +142,7 @@ func (mr *MessageRepository) PostMessage(body dto.PostMessage) (*Message, error)
 	return &message, nil
 }
 
-func (mr *MessageRepository) PatchMessage(messageId int64, body dto.PatchMessage) (*Message, error) {
+func (mr *MessageRepository) PatchMessage(messageId int64, body PatchMessageRequest) (*Message, error) {
 	var message Message
 
 	query, err := mr.connection.Prepare(`

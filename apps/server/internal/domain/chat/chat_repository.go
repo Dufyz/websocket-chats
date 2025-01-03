@@ -2,7 +2,9 @@ package chat
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"server/internal/domain/user"
 
 	"go.uber.org/zap"
 )
@@ -118,8 +120,25 @@ func (cr *ChatRepository) GetChats(body GetChatsRequest) (GetChatsResponse, erro
 		return GetChatsResponse{}, err
 	}
 
-	// Main query with pagination and search
+	// Main query with pagination, search, and user statistics
 	query := fmt.Sprintf(`
+        WITH MessageStats AS (
+            SELECT 
+                m.chat_id,
+                COUNT(DISTINCT m.user_id) as total_users,
+                COUNT(m.id) as total_messages,
+                jsonb_agg(
+                    DISTINCT jsonb_build_object(
+                        'id', u.id,
+                        'name', u.name,
+                        'created_at', u.created_at,
+                        'updated_at', u.updated_at
+                    )
+                ) as users
+            FROM messages m
+            JOIN users u ON m.user_id = u.id
+            GROUP BY m.chat_id
+        )
         SELECT 
             c.id, 
             c.admin_user_id, 
@@ -127,8 +146,12 @@ func (cr *ChatRepository) GetChats(body GetChatsRequest) (GetChatsResponse, erro
             c.category, 
             c.description, 
             c.created_at, 
-            c.updated_at
+            c.updated_at,
+            COALESCE(ms.total_users, 0) as total_users,
+            COALESCE(ms.total_messages, 0) as total_messages,
+            COALESCE(ms.users, '[]'::jsonb) as users
         FROM "chats" c
+        LEFT JOIN MessageStats ms ON c.id = ms.chat_id
         %s
         ORDER BY c.id
         LIMIT $%d
@@ -149,6 +172,7 @@ func (cr *ChatRepository) GetChats(body GetChatsRequest) (GetChatsResponse, erro
 	for rows.Next() {
 		var chatStat ChatWithStats
 		var chat Chat
+		var usersJSON []byte
 		err = rows.Scan(
 			&chat.ID,
 			&chat.Admin_user_id,
@@ -157,15 +181,24 @@ func (cr *ChatRepository) GetChats(body GetChatsRequest) (GetChatsResponse, erro
 			&chat.Description,
 			&chat.Created_at,
 			&chat.Updated_at,
+			&chatStat.Total_users,
+			&chatStat.Total_messages,
+			&usersJSON,
 		)
 		if err != nil {
 			zap.L().Error("Error scanning rows Chat/Repository/GetChats", zap.Error(err))
 			return GetChatsResponse{}, err
 		}
 
+		// Parse users JSON into User structs
+		var users []user.User
+		if err = json.Unmarshal(usersJSON, &users); err != nil {
+			zap.L().Error("Error unmarshaling users JSON", zap.Error(err))
+			return GetChatsResponse{}, err
+		}
+
 		chatStat.Chat = chat
-		chatStat.Total_users = 10
-		chatStat.Total_messages = 100
+		chatStat.Users = users
 		chatStats = append(chatStats, chatStat)
 		lastID = chat.ID
 	}

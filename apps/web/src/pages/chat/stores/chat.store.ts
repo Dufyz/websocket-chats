@@ -1,15 +1,18 @@
 import { Chat } from "@/types/chat.type";
 import { Message } from "@/types/message.type";
+import { User } from "@/types/user.type";
 import { create } from "zustand";
 
 type ChatStore = {
   chats: Chat[];
 
   setChats: (chats: Chat[]) => void;
+  setChatMessages: (chatId: number, messages: Message[]) => void;
 
   create: (chat: Chat) => void;
   update: (chat: Partial<Chat>) => void;
   delete: (id: number) => void;
+  addUserToChat: (chatId: number, user: User) => void;
 
   createMessage: (chatId: number, message: Message) => void;
   updateMessage: (chatId: number, messageId: number, message: string) => void;
@@ -32,6 +35,26 @@ export const useChatStore = create<ChatStore>((set) => ({
       }, state.chats),
     })),
 
+  setChatMessages: (chatId, messages) =>
+    set((state) => ({
+      chats: state.chats.map((chat) =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              messages: messages.reduce((acc, message) => {
+                const index = acc.findIndex((m) => m.id === message.id);
+                if (index !== -1) {
+                  acc[index] = { ...acc[index], ...message };
+                } else {
+                  acc = [...acc, message];
+                }
+                return acc;
+              }, chat.messages || []),
+            }
+          : chat
+      ),
+    })),
+
   create: (chat) =>
     set((state) => ({
       chats: [...state.chats, chat],
@@ -45,6 +68,19 @@ export const useChatStore = create<ChatStore>((set) => ({
   delete: (id) =>
     set((state) => ({
       chats: state.chats.filter((c) => c.id !== id),
+    })),
+
+  addUserToChat: (chatId, user) =>
+    set((state) => ({
+      chats: state.chats.map((c) =>
+        c.id === chatId
+          ? {
+              ...c,
+              users: [...(c.users || []), user],
+              total_users: (c.total_users || 0) + 1,
+            }
+          : c
+      ),
     })),
 
   createMessage: (chatId, message) =>

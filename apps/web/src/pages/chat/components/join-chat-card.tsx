@@ -47,7 +47,7 @@ export default function JoinChatCard({ chat }: JoinChatCardProps) {
             </div>
           </div>
           {chat.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
               {chat.description}
             </p>
           )}
