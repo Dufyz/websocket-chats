@@ -1,11 +1,10 @@
-import { Copy, Trash2, Info, Pencil } from "lucide-react";
+import { Copy, Trash2, Pencil } from "lucide-react";
 
 interface MessageMenuItemsProps {
   isOwnMessage: boolean;
   onCopy?: () => void;
   onUpdate?: () => void;
   onDelete?: () => void;
-  onInfo?: () => void;
   MenuItemComponent: React.ComponentType<{
     onClick?: () => void;
     className?: string;
@@ -21,7 +20,6 @@ export function MessageMenu({
   onCopy,
   onDelete,
   onUpdate,
-  onInfo,
   MenuItemComponent,
   SeparatorComponent,
 }: MessageMenuItemsProps) {
@@ -50,12 +48,6 @@ export function MessageMenu({
           </MenuItemComponent>
         </>
       )}
-
-      <SeparatorComponent className="bg-[#182229]" />
-      <MenuItemComponent onClick={onInfo} className={itemClassName}>
-        <Info className="h-4 w-4" />
-        <span>Dados</span>
-      </MenuItemComponent>
     </>
   );
 }

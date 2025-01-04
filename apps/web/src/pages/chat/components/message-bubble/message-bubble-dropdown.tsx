@@ -14,7 +14,6 @@ interface MessageDropdownProps {
   onCopy?: () => void;
   onDelete?: () => void;
   onUpdate?: () => void;
-  onInfo?: () => void;
 }
 
 export function MessageDropdown(props: MessageDropdownProps) {

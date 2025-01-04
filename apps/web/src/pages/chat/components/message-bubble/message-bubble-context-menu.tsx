@@ -14,7 +14,6 @@ interface MessageContextMenuProps {
   onCopy?: () => void;
   onUpdate?: () => void;
   onDelete?: () => void;
-  onInfo?: () => void;
 }
 
 export function MessageContextMenu({
