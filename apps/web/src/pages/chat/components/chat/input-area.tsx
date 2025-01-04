@@ -73,8 +73,7 @@ export default function InputArea({
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({
-      inline: "end",
-      block: "end",
+      inline: "nearest",
       behavior: "instant",
     });
   }, [messagesEndRef]);

@@ -9,7 +9,6 @@ import { Message } from "@/types/message.type";
 import { getChatById } from "@/queries/chat.queries";
 
 export default function ChatPage() {
-  useSocketChat();
   const { joinRoom, leaveRoom } = useSocket();
   const { signedIn, authModalOpen, setAuthModalOpen } = useAuth();
   const { id: chatId } = useParams();
@@ -18,6 +17,9 @@ export default function ChatPage() {
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useSocketChat({ messagesEndRef, scrollAreaRef });
 
   const createChat = useChatStore((state) => state.create);
   const chats = useChatStore((state) => state.chats);
@@ -74,6 +76,7 @@ export default function ChatPage() {
         <Chat.Header chat={chat} />
         <Chat.ChatArea
           chat={chat}
+          scrollAreaRef={scrollAreaRef}
           messagesEndRef={messagesEndRef}
           setIsEditing={setIsEditing}
           setEditingMessage={setEditingMessage}

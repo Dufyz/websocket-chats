@@ -104,12 +104,31 @@ export function useDeleteChat() {
   return { deleteChat };
 }
 
-export function useSocketChat() {
+export function useSocketChat({
+  messagesEndRef,
+  scrollAreaRef,
+}: {
+  messagesEndRef: React.RefObject<HTMLDivElement>;
+  scrollAreaRef: React.RefObject<HTMLDivElement>;
+}) {
   const { socket } = useSocket();
   const createMessage = useChatStore((state) => state.createMessage);
   const updateMessage = useChatStore((state) => state.updateMessage);
   const deleteMessage = useChatStore((state) => state.deleteMessage);
   const addUserToChat = useChatStore((state) => state.addUserToChat);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({
+      inline: "nearest",
+      behavior: "instant",
+    });
+  }, [messagesEndRef]);
+
+  const isNearBottom = useCallback(() => {
+    if (!scrollAreaRef.current) return false;
+    const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current;
+    return scrollHeight - (scrollTop + clientHeight) <= 400;
+  }, [scrollAreaRef]);
 
   const onSocketMessage = useCallback(
     (event: MessageEvent) => {
@@ -121,6 +140,11 @@ export function useSocketChat() {
         if (data.payload.action === "create") {
           createMessage(data.payload.chat_id, data.payload.message);
           addUserToChat(data.payload.chat_id, data.payload.user);
+
+          if (!isNearBottom()) return;
+
+          setTimeout(scrollToBottom, 10);
+
           return;
         }
 
@@ -142,7 +166,14 @@ export function useSocketChat() {
         console.error("Mensagem recebida (não-JSON):", event.data);
       }
     },
-    [addUserToChat, createMessage, deleteMessage, updateMessage]
+    [
+      addUserToChat,
+      createMessage,
+      deleteMessage,
+      isNearBottom,
+      scrollToBottom,
+      updateMessage,
+    ]
   );
 
   useEffect(() => {

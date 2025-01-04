@@ -1,7 +1,7 @@
 import { MessageBubble } from "@/pages/chat/components/message-bubble/message-bubble";
 import { cn } from "@/lib/utils";
 import { Chat } from "@/types/chat.type";
-import { Dispatch, SetStateAction, useMemo, useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import { useGetChatMessages } from "../../hooks/chat-fetchs.hook";
 import { Loader2 } from "lucide-react";
 import { Message } from "@/types/message.type";
@@ -9,6 +9,7 @@ import { Message } from "@/types/message.type";
 interface ChatAreaProps {
   chat: Chat;
   messagesEndRef: React.RefObject<HTMLDivElement>;
+  scrollAreaRef: React.RefObject<HTMLDivElement>;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
   setEditingMessage: Dispatch<SetStateAction<Message | null>>;
 }
@@ -22,14 +23,13 @@ const darkPattern = `url("data:image/svg+xml,%3Csvg width='100' height='100' vie
 export default function ChatArea({
   chat,
   messagesEndRef,
+  scrollAreaRef,
   setEditingMessage,
   setIsEditing,
 }: ChatAreaProps) {
   const { fetchNextPage, hasNextPage, isFetchingNextPage } = useGetChatMessages(
     { chat }
   );
-
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const totalMessages = chat.total_messages || 0;
 

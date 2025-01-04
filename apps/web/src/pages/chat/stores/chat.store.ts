@@ -76,8 +76,17 @@ export const useChatStore = create<ChatStore>((set) => ({
         c.id === chatId
           ? {
               ...c,
-              users: [...(c.users || []), user],
-              total_users: (c.total_users || 0) + 1,
+              users: [...(c.users || []), user].reduce((acc, user) => {
+                const index = acc.findIndex((u) => u.id === user.id);
+                if (index !== -1) {
+                  acc[index] = { ...acc[index], ...user };
+                } else {
+                  acc = [...acc, user];
+                }
+
+                return acc;
+              }, c.users || []),
+              total_users: c.users?.length ? c.users.length : 1,
             }
           : c
       ),
