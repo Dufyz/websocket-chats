@@ -15,6 +15,8 @@ type GetChatsResponse struct {
 	} `json:"pagination"`
 }
 
+type GetChatByIdResponse = ChatWithStats
+
 type PostChatRequest struct {
 	Admin_user_id int64   `json:"admin_user_id" validate:"required"`
 	Name          string  `json:"name" validate:"required"`

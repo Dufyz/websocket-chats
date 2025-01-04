@@ -10,7 +10,7 @@ func NewChatUsecase(repository ChatRepositoryInterface) ChatUsecase {
 	}
 }
 
-func (uc *ChatUsecase) GetChatById(chatId int64) (*Chat, error) {
+func (uc *ChatUsecase) GetChatById(chatId int64) (GetChatByIdResponse, error) {
 	return uc.repository.GetChatById(chatId)
 }
 

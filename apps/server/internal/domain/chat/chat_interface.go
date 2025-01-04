@@ -1,7 +1,7 @@
 package chat
 
 type ChatRepositoryInterface interface {
-	GetChatById(chat_id int64) (*Chat, error)
+	GetChatById(chat_id int64) (GetChatByIdResponse, error)
 	GetChatsByUserId(user_id int64) ([]Chat, error)
 	GetChats(body GetChatsRequest) (GetChatsResponse, error)
 

@@ -32,15 +32,18 @@ export async function getChats(
   return response.data;
 }
 
-export async function getChatById(id: string): Promise<{
+export async function getChatById(id: number): Promise<{
   chat: Chat;
+  users: User[];
+  total_users: number;
+  total_messages: number;
 }> {
   const response = await api.get(`/chats/${id}`);
 
   return response.data;
 }
 
-export async function getChatByUserId(userId: string): Promise<{
+export async function getChatByUserId(userId: number): Promise<{
   chats: Chat[];
 }> {
   const response = await api.get(`/chats/user/${userId}`);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "@/hooks/auth.hook";
 import { useChatStore } from "@/pages/chat/stores/chat.store";
@@ -6,6 +6,7 @@ import { Chat } from "./components/chat";
 import { useSocket } from "@/hooks/socket.hook";
 import { useSocketChat } from "./hooks/chat-actions.hook";
 import { Message } from "@/types/message.type";
+import { getChatById } from "@/queries/chat.queries";
 
 export default function ChatPage() {
   useSocketChat();
@@ -18,11 +19,31 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const createChat = useChatStore((state) => state.create);
   const chats = useChatStore((state) => state.chats);
   const chat = chats.find((c) => c.id === Number(chatId));
 
+  const getChat = useCallback(async () => {
+    try {
+      const { chat, users, total_messages, total_users } = await getChatById(
+        Number(chatId)
+      );
+
+      if (!chat) return;
+
+      createChat({
+        ...chat,
+        users: users,
+        total_messages,
+        total_users,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }, [chatId, createChat]);
+
   useEffect(() => {
-    if (signedIn) return;
+    if (signedIn) return setAuthModalOpen(false);
     if (authModalOpen) return;
 
     setAuthModalOpen(true);
@@ -37,6 +58,13 @@ export default function ChatPage() {
       leaveRoom(`chat_${chat.id}`);
     };
   }, [chat?.id, joinRoom, leaveRoom]);
+
+  useEffect(() => {
+    if (!chatId) return;
+    if (chat?.id === Number(chatId)) return;
+
+    getChat();
+  }, [chat, chatId, getChat]);
 
   if (!chat) return null;
 

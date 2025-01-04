@@ -28,22 +28,18 @@ func (cc *chatController) GetChatById(ctx echo.Context) error {
 		})
 	}
 
-	chat, err := cc.chatUsecase.GetChatById(chatId)
+	data, err := cc.chatUsecase.GetChatById(chatId)
 	if err != nil {
-
 		return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
 		})
 	}
 
-	if chat == nil {
-		return ctx.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "Chat not found!",
-		})
-	}
-
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
-		"chat": chat,
+		"chat":           data.Chat,
+		"users":          data.Users,
+		"total_users":    data.Total_users,
+		"total_messages": data.Total_messages,
 	})
 }
 
