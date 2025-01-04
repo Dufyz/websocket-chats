@@ -3,20 +3,24 @@ import { User } from "@/types/user.type";
 import { MessageContextMenu } from "./message-bubble-context-menu";
 import { MessageDropdown } from "./message-bubble-dropdown";
 import { cn } from "@/lib/utils";
-import {
-  useDeleteMessage,
-  useUpdateMessage,
-} from "../../hooks/message-actions.hook";
+import { useDeleteMessage } from "../../hooks/message-actions.hook";
 import { useAuth } from "@/hooks/auth.hook";
+import { Dispatch, SetStateAction } from "react";
 
 interface MessageBubbleProps {
   message: Message;
   user: User;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
+  setEditingMessage: Dispatch<SetStateAction<Message | null>>;
 }
 
-export function MessageBubble({ message, user }: MessageBubbleProps) {
+export function MessageBubble({
+  message,
+  user,
+  setEditingMessage,
+  setIsEditing,
+}: MessageBubbleProps) {
   const { user: loggedInUser } = useAuth();
-  const { updateMessage } = useUpdateMessage();
   const { deleteMessage } = useDeleteMessage();
 
   const isOwnMessage = message.user_id === loggedInUser?.id;
@@ -25,7 +29,10 @@ export function MessageBubble({ message, user }: MessageBubbleProps) {
     navigator.clipboard.writeText(message.message);
   };
 
-  const handleUpdateMessage = () => {};
+  const handleUpdateMessage = () => {
+    setEditingMessage(message);
+    setIsEditing(true);
+  };
 
   const handleDeleteMessage = () => {
     deleteMessage(message.chat_id, message.id);
