@@ -34,7 +34,7 @@ func TestRepositorytPostChat(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 
-	postChat := dto.PostChat{
+	postChat := chat.PostChatRequest{
 		Admin_user_id: user.ID,
 		Name:          "Test Chat",
 		Category:      "chat",

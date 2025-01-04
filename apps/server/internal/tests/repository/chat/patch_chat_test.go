@@ -34,20 +34,20 @@ func TestRepositorytPatchChat(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 
-	postChat := dto.PostChat{
+	postChat := chat.PostChatRequest{
 		Admin_user_id: user.ID,
 		Name:          "Test Chat",
 		Category:      "chat",
 		Description:   nil,
 	}
 
+	patchChat := chat.PatchChatRequest{
+		Name: "Test Chat Updated",
+	}
+
 	chat, err := chatRepo.PostChat(postChat)
 	assert.NoError(t, err)
 	assert.NotNil(t, chat)
-
-	patchChat := dto.PatchChat{
-		Name: "Test Chat Updated",
-	}
 
 	chat, err = chatRepo.PatchChat(chat.ID, patchChat)
 	assert.NoError(t, err)

@@ -52,12 +52,20 @@ func TestRepositoryGetMessagesByChatId(t *testing.T) {
 		Message: "Test Message",
 	}
 
+	limit := 10
+	getMessageRequest := message.GetMessagesRequest{
+		Chat_id: chat.ID,
+		Limit:   &limit,
+	}
+
 	message, err := messageRepo.PostMessage(postMessage)
 	assert.NoError(t, err)
 
-	messages, err := messageRepo.GetMessagesByChatId(chat.ID)
+	data, err := messageRepo.GetMessagesByChatId(getMessageRequest)
 	assert.NoError(t, err)
-	assert.NotNil(t, messages)
+	assert.NotNil(t, data)
+
+	messages := data.Messages
 
 	assert.Equal(t, message.Chat_id, messages[0].Chat_id)
 	assert.Equal(t, message.User_id, messages[0].User_id)
