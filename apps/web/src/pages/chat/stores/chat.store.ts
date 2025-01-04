@@ -87,7 +87,22 @@ export const useChatStore = create<ChatStore>((set) => ({
     set((state) => ({
       chats: state.chats.map((c) =>
         c.id === chatId
-          ? { ...c, messages: [...(c.messages || []), message] }
+          ? {
+              ...c,
+              messages: [...(c.messages || []), message].reduce(
+                (acc, message) => {
+                  const index = acc.findIndex((m) => m.id === message.id);
+                  if (index !== -1) {
+                    acc[index] = { ...acc[index], ...message };
+                  } else {
+                    acc = [...acc, message];
+                  }
+
+                  return acc;
+                },
+                c.messages || []
+              ),
+            }
           : c
       ),
     })),

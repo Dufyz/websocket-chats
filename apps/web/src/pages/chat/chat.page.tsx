@@ -3,8 +3,12 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "@/hooks/auth.hook";
 import { useChatStore } from "@/pages/chat/stores/chat.store";
 import { Chat } from "./components/chat";
+import { useSocket } from "@/hooks/socket.hook";
+import { useSocketChat } from "./hooks/chat-actions.hook";
 
 export default function ChatPage() {
+  useSocketChat();
+  const { joinRoom, leaveRoom } = useSocket();
   const { signedIn, authModalOpen, setAuthModalOpen } = useAuth();
   const { id: chatId } = useParams();
 
@@ -19,6 +23,16 @@ export default function ChatPage() {
 
     setAuthModalOpen(true);
   }, [authModalOpen, setAuthModalOpen, signedIn]);
+
+  useEffect(() => {
+    if (!chat?.id) return;
+
+    joinRoom(`chat_${chat.id}`);
+
+    return () => {
+      leaveRoom(`chat_${chat.id}`);
+    };
+  }, [chat?.id, joinRoom, leaveRoom]);
 
   if (!chat) return null;
 

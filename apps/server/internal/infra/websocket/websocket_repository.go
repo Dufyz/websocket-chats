@@ -13,6 +13,15 @@ func NewRoomManager() *RoomManager {
 	}
 }
 
+func GetEventService() *EventService {
+	once.Do(func() {
+		eventServiceInstance = &EventService{
+			roomManager: NewRoomManager(),
+		}
+	})
+	return eventServiceInstance
+}
+
 func (r *Room) handleMessages() {
 	defer func() {
 		if err := recover(); err != nil {
@@ -109,5 +118,40 @@ func (rm *RoomManager) RemoveClientFromAllRooms(ws *websocket.Conn) {
 			close(room.broadcast)
 			delete(rm.rooms, room_id)
 		}
+	}
+}
+
+func (es *EventService) SetRoomManager(rm *RoomManager) {
+	es.mu.Lock()
+	defer es.mu.Unlock()
+	es.roomManager = rm
+}
+
+func (es *EventService) GetRoomManager() *RoomManager {
+	es.mu.RLock()
+	defer es.mu.RUnlock()
+	return es.roomManager
+}
+
+func (es *EventService) EmitToRoom(roomID string, event Event) {
+	es.mu.RLock()
+	rm := es.roomManager
+	es.mu.RUnlock()
+
+	if room := rm.GetOrCreateRoom(roomID); room != nil {
+		room.BroadcastEvent(event)
+	}
+}
+
+func (es *EventService) EmitToAllRooms(event Event) {
+	es.mu.RLock()
+	rm := es.roomManager
+	es.mu.RUnlock()
+
+	rm.mutex.RLock()
+	defer rm.mutex.RUnlock()
+
+	for _, room := range rm.rooms {
+		room.BroadcastEvent(event)
 	}
 }

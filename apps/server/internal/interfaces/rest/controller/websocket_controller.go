@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	ws "server/internal/infra/websocket"
 
 	"github.com/labstack/echo/v4"
@@ -11,11 +10,17 @@ import (
 
 type websocketController struct {
 	room_manager *ws.RoomManager
+	eventService *ws.EventService
 }
 
 func NewWebsocketController() *websocketController {
+	rm := ws.NewRoomManager()
+	es := ws.GetEventService()
+	es.SetRoomManager(rm)
+
 	return &websocketController{
-		room_manager: ws.NewRoomManager(),
+		room_manager: rm,
+		eventService: es,
 	}
 }
 
@@ -40,9 +45,6 @@ func (wc *websocketController) HandleConnection(ctx echo.Context) error {
 				continue
 			}
 
-			fmt.Println("Received event: ", event)
-			fmt.Println("Received msg: ", msg)
-
 			switch event.Type {
 			case "join":
 				if current_room != nil {
@@ -55,25 +57,6 @@ func (wc *websocketController) HandleConnection(ctx echo.Context) error {
 				if current_room != nil {
 					current_room.RemoveClient(conn)
 					current_room = nil
-				}
-
-			case "message":
-				if current_room != nil {
-					var payload ws.MessagePayload
-					payloadBytes, _ := json.Marshal(event.Payload)
-					if err := json.Unmarshal(payloadBytes, &payload); err != nil {
-						continue
-					}
-
-					messageEvent := ws.Event{
-						Type:    "message",
-						Room_id: event.Room_id,
-						Payload: map[string]interface{}{
-							"message": payload.Message,
-						},
-					}
-
-					current_room.BroadcastEvent(messageEvent)
 				}
 			}
 

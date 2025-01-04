@@ -17,31 +17,50 @@ func NewMessageRepository(connection *sql.DB) *MessageRepository {
 	}
 }
 
+func (mr *MessageRepository) GetMessageById(messageId int64) (*Message, error) {
+	var message Message
+
+	query, err := mr.connection.Prepare(`
+		SELECT id, chat_id, user_id, message, created_at, updated_at
+		FROM "messages"
+		WHERE id = $1
+	`)
+
+	if err != nil {
+		zap.L().Error("Error preparing query Message/Repository/GetMessageById", zap.Error(err))
+		return nil, err
+	}
+
+	err = query.QueryRow(messageId).Scan(&message.ID, &message.Chat_id, &message.User_id, &message.Message, &message.Created_at, &message.Updated_at)
+	if err != nil {
+		zap.L().Error("Error querying row Message/Repository/GetMessageById", zap.Error(err))
+		return nil, err
+	}
+
+	return &message, nil
+}
+
 func (mr *MessageRepository) GetMessagesByChatId(body GetMessagesRequest) (GetMessagesResponse, error) {
 	var response GetMessagesResponse
 	var countQuery string
 	var dataQuery string
 	var args []interface{}
 
-	// Query base para contar total de registros
 	countQuery = `
 		SELECT COUNT(*) 
 		FROM "messages" 
 		WHERE chat_id = $1
 	`
 
-	// Query base para buscar mensagens
 	dataQuery = `
 		SELECT id, chat_id, user_id, message, created_at, updated_at
 		FROM "messages"
 		WHERE chat_id = $1
 	`
 
-	// Adiciona argumentos base
 	args = append(args, body.Chat_id)
 	argCount := 1
 
-	// Se tiver cursor, pega mensagens mais antigas (ids menores que o cursor)
 	if body.Cursor != nil {
 		dataQuery += fmt.Sprintf(" AND id < $%d", argCount+1)
 		countQuery += fmt.Sprintf(" AND id < $%d", argCount+1)
@@ -49,19 +68,15 @@ func (mr *MessageRepository) GetMessagesByChatId(body GetMessagesRequest) (GetMe
 		argCount++
 	}
 
-	// Ordena por ID decrescente para sempre pegar as mensagens mais recentes primeiro
 	dataQuery += " ORDER BY id DESC"
 
-	// Adiciona limite se fornecido
 	if body.Limit != nil {
 		dataQuery += fmt.Sprintf(" LIMIT $%d", argCount+1)
 		args = append(args, *body.Limit)
 	} else {
-		// Limite padrão de 50 registros
 		dataQuery += " LIMIT 50"
 	}
 
-	// Prepara e executa query de contagem
 	var total int64
 	err := mr.connection.QueryRow(countQuery, args[:len(args)-1]...).Scan(&total)
 	if err != nil {
@@ -69,7 +84,6 @@ func (mr *MessageRepository) GetMessagesByChatId(body GetMessagesRequest) (GetMe
 		return response, err
 	}
 
-	// Prepara e executa query principal
 	rows, err := mr.connection.Query(dataQuery, args...)
 	if err != nil {
 		zap.L().Error("Error querying messages", zap.Error(err))
@@ -98,7 +112,6 @@ func (mr *MessageRepository) GetMessagesByChatId(body GetMessagesRequest) (GetMe
 		lastID = message.ID
 	}
 
-	// Configura a resposta
 	response.Messages = messages
 	response.Pagination.Total = total
 
@@ -106,7 +119,6 @@ func (mr *MessageRepository) GetMessagesByChatId(body GetMessagesRequest) (GetMe
 		response.Pagination.Cursor = *body.Cursor
 	}
 
-	// Se retornou o número máximo de registros, provavelmente há mais mensagens antigas
 	limit := 50
 	if body.Limit != nil {
 		limit = *body.Limit

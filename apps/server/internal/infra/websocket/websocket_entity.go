@@ -6,9 +6,15 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-type MessagePayload struct {
-	Message string `json:"message"`
+type EventService struct {
+	roomManager *RoomManager
+	mu          sync.RWMutex
 }
+
+var (
+	eventServiceInstance *EventService
+	once                 sync.Once
+)
 
 type Event struct {
 	Type    string      `json:"type"`
