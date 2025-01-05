@@ -1,4 +1,4 @@
-package dto
+package user
 
 type PostUserSignIn struct {
 	Name     string `json:"name"`

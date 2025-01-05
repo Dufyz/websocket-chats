@@ -5,7 +5,6 @@ import (
 	"server/internal/domain/message"
 	"server/internal/domain/user"
 	dbT "server/internal/infra/db"
-	"server/internal/interfaces/dto"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,7 +22,7 @@ func TestRepositoryPostMessage(t *testing.T) {
 	chatRepo := chat.NewChatRepository(db)
 	messageRepo := message.NewMessageRepository(db)
 
-	postSignUp := dto.PostUserSignUp{
+	postSignUp := user.PostUserSignUp{
 		Name:     "Test User",
 		Password: "123456",
 	}

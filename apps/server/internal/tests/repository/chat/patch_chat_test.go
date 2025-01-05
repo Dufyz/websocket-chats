@@ -4,7 +4,6 @@ import (
 	"server/internal/domain/chat"
 	"server/internal/domain/user"
 	dbT "server/internal/infra/db"
-	"server/internal/interfaces/dto"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -22,7 +21,7 @@ func TestRepositorytPatchChat(t *testing.T) {
 	userRepo := user.NewUserRepository(db)
 	chatRepo := chat.NewChatRepository(db)
 
-	postSignUp := dto.PostUserSignUp{
+	postSignUp := user.PostUserSignUp{
 		Name:     "Test User",
 		Password: "123456",
 	}

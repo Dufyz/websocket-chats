@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 	"server/internal/domain/user"
-	"server/internal/interfaces/dto"
 	"server/internal/interfaces/errors"
 	"server/internal/utils"
 
@@ -22,7 +21,7 @@ func NewUserController(userUsecase user.UserUsecase) userController {
 }
 
 func (uc *userController) SignUp(ctx echo.Context) error {
-	var body dto.PostUserSignUp
+	var body user.PostUserSignUp
 	validate := validator.New()
 
 	if err := ctx.Bind(&body); err != nil {
@@ -65,7 +64,7 @@ func (uc *userController) SignUp(ctx echo.Context) error {
 }
 
 func (uc *userController) SignIn(ctx echo.Context) error {
-	var body dto.PostUserSignIn
+	var body user.PostUserSignIn
 	validate := validator.New()
 
 	if err := ctx.Bind(&body); err != nil {
@@ -101,7 +100,7 @@ func (uc *userController) SignIn(ctx echo.Context) error {
 }
 
 func (uc *userController) VerifyToken(ctx echo.Context) error {
-	var body dto.PostUserVerifyToken
+	var body user.PostUserVerifyToken
 	validate := validator.New()
 
 	if err := ctx.Bind(&body); err != nil {
@@ -137,7 +136,7 @@ func (uc *userController) VerifyToken(ctx echo.Context) error {
 }
 
 func (uc *userController) PatchUser(ctx echo.Context) error {
-	var body dto.PatchUser
+	var body user.PatchUser
 	validate := validator.New()
 
 	userId, errorMessage := utils.GetInt64Param(ctx, "id")
@@ -180,7 +179,7 @@ func (uc *userController) PatchUser(ctx echo.Context) error {
 }
 
 func (uc *userController) PatchUserPassword(ctx echo.Context) error {
-	var body dto.PatchUserPassword
+	var body user.PatchUserPassword
 	validate := validator.New()
 
 	userId, errorMessage := utils.GetInt64Param(ctx, "id")

@@ -4,7 +4,6 @@ import (
 	"server/internal/domain/chat"
 	"server/internal/domain/user"
 	dbT "server/internal/infra/db"
-	"server/internal/interfaces/dto"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -22,7 +21,7 @@ func TestRepositorytGetChatById(t *testing.T) {
 	userRepo := user.NewUserRepository(db)
 	chatRepo := chat.NewChatRepository(db)
 
-	postSignUp := dto.PostUserSignUp{
+	postSignUp := user.PostUserSignUp{
 		Name:     "Test User",
 		Password: "123456",
 	}
@@ -45,9 +44,11 @@ func TestRepositorytGetChatById(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, chat)
 
-	chat, err = chatRepo.GetChatById(chat.ID)
+	data, err := chatRepo.GetChatById(chat.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, chat)
+
+	chat = &data.Chat
 
 	assert.Equal(t, postChat.Admin_user_id, chat.Admin_user_id)
 	assert.Equal(t, postChat.Name, chat.Name)

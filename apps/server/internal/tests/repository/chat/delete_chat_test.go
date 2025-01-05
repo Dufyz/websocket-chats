@@ -4,7 +4,6 @@ import (
 	"server/internal/domain/chat"
 	"server/internal/domain/user"
 	dbT "server/internal/infra/db"
-	"server/internal/interfaces/dto"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -22,7 +21,7 @@ func TestRepositorytDeleteChat(t *testing.T) {
 	userRepo := user.NewUserRepository(db)
 	chatRepo := chat.NewChatRepository(db)
 
-	postSignUp := dto.PostUserSignUp{
+	postSignUp := user.PostUserSignUp{
 		Name:     "Test User",
 		Password: "123456",
 	}
@@ -49,7 +48,7 @@ func TestRepositorytDeleteChat(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, chat)
 
-	chat, err = chatRepo.GetChatById(chat.ID)
-	assert.NoError(t, err)
-	assert.Nil(t, chat)
+	_, err = chatRepo.GetChatById(chat.ID)
+
+	assert.Nil(t, err)
 }

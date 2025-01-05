@@ -3,7 +3,6 @@ package user_test
 import (
 	"server/internal/domain/user"
 	dbT "server/internal/infra/db"
-	"server/internal/interfaces/dto"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -20,7 +19,7 @@ func TestRepositorytGetUserById(t *testing.T) {
 
 	userRepo := user.NewUserRepository(db)
 
-	postSignUp := dto.PostUserSignUp{
+	postSignUp := user.PostUserSignUp{
 		Name:     "Test User",
 		Password: "123456",
 	}

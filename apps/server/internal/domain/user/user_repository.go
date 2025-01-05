@@ -2,7 +2,6 @@ package user
 
 import (
 	"database/sql"
-	"server/internal/interfaces/dto"
 
 	"go.uber.org/zap"
 )
@@ -17,7 +16,7 @@ func NewUserRepository(connection *sql.DB) *UserRepository {
 	}
 }
 
-func (ur *UserRepository) SignUp(body dto.PostUserSignUp) error {
+func (ur *UserRepository) SignUp(body PostUserSignUp) error {
 	tx, err := ur.connection.Begin()
 	defer tx.Rollback()
 
@@ -119,7 +118,7 @@ func (ur *UserRepository) GetUserByName(name string) (*User, error) {
 	return &user, nil
 }
 
-func (ur *UserRepository) PatchUser(userId int64, body dto.PatchUser) (*User, error) {
+func (ur *UserRepository) PatchUser(userId int64, body PatchUser) (*User, error) {
 	var updatedUser User
 
 	tx, err := ur.connection.Begin()

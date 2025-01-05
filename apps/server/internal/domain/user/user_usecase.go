@@ -3,7 +3,6 @@ package user
 import (
 	"fmt"
 	"os"
-	"server/internal/interfaces/dto"
 	"server/internal/interfaces/errors"
 	"time"
 
@@ -21,13 +20,13 @@ func NewUserUsecase(repository UserRepositoryInterface) UserUsecase {
 	}
 }
 
-func (uc *UserUsecase) SignUp(body dto.PostUserSignUp) (*User, string, error) {
+func (uc *UserUsecase) SignUp(body PostUserSignUp) (*User, string, error) {
 	hashedPassword, err := uc.HashUserPassword(body.Password)
 	if err != nil {
 		return nil, "", err
 	}
 
-	err = uc.repository.SignUp(dto.PostUserSignUp{
+	err = uc.repository.SignUp(PostUserSignUp{
 		Name:     body.Name,
 		Password: hashedPassword,
 	})
@@ -54,7 +53,7 @@ func (uc *UserUsecase) SignUp(body dto.PostUserSignUp) (*User, string, error) {
 	return user, token, err
 }
 
-func (uc *UserUsecase) SignIn(body dto.PostUserSignIn) (*User, string, error) {
+func (uc *UserUsecase) SignIn(body PostUserSignIn) (*User, string, error) {
 	user, err := uc.repository.GetUserByName(body.Name)
 	if err != nil {
 		return nil, "", err
@@ -87,11 +86,11 @@ func (uc *UserUsecase) GetUserByName(name string) (*User, error) {
 	return uc.repository.GetUserByName(name)
 }
 
-func (uc *UserUsecase) PatchUser(userId int64, body dto.PatchUser) (*User, error) {
+func (uc *UserUsecase) PatchUser(userId int64, body PatchUser) (*User, error) {
 	return uc.repository.PatchUser(userId, body)
 }
 
-func (uc *UserUsecase) PatchUserPassword(userId int64, body dto.PatchUserPassword) (*User, error) {
+func (uc *UserUsecase) PatchUserPassword(userId int64, body PatchUserPassword) (*User, error) {
 	user, err := uc.repository.GetUserById(userId)
 	if err != nil {
 		return nil, err
